@@ -3,12 +3,14 @@
 #include "MenuHeader.h"
 #include "WindowHeader.h"
 #include "Game.h"
+#include "Audio.h"
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
 
 std::vector<std::string> saves;
 int curLevel = 0;
+
 
 void GetAllSaveFiles()
 {
@@ -32,6 +34,7 @@ int main()
 	MainMenu myMainMenu;
 	GameClass myGame;
 	MainRenderWindow mainWindow;
+	
 
 	mainWindow.window.create(sf::VideoMode(mainWindow.windowWidth, mainWindow.windowHeight), "My Program", sf::Style::Titlebar | sf::Style::Close);
 
@@ -111,7 +114,7 @@ EditorClass::EditorClass()
 	}
 }
 
-bool EditorClass::Start(MainRenderWindow &mainWindow)
+bool EditorClass::Start(MainRenderWindow& mainWindow)
 {
 	//setup our views
 	toolsView = sf::View(sf::FloatRect(0, 0, windowWidth * 0.045f, windowHeight));
@@ -120,6 +123,9 @@ bool EditorClass::Start(MainRenderWindow &mainWindow)
 	levelEditView.setViewport(sf::FloatRect(0.03, 0, 1, 1));
 	//setup the window!
 	//window.create(sf::VideoMode(windowWidth, windowHeight), "Level Editor", sf::Style::Titlebar | sf::Style::Close);
+
+	//inputfield updatepos(insert new coordinates)
+	inputField.UpdatePos(sf::Vector2f(1, 52));
 
 	//setup variables t paint with 
 	curTileType = Tile::Type::Platform;
@@ -151,7 +157,7 @@ bool EditorClass::Start(MainRenderWindow &mainWindow)
 	return true;
 }
 
-void EditorClass::Update(MainRenderWindow &mainWindow)
+void EditorClass::Update(MainRenderWindow& mainWindow)
 {
 	//prep window for displaying stuff
 	mainWindow.window.clear(sf::Color::White);
@@ -195,9 +201,9 @@ void EditorClass::Update(MainRenderWindow &mainWindow)
 	mainWindow.window.draw(tools);
 	mainWindow.window.setView(levelEditView);
 	worldPos = mainWindow.window.mapPixelToCoords(sf::Mouse::getPosition(mainWindow.window), mainWindow.window.getView());
-	
+
 	//draw our tiles
-	
+
 	for (int i = 0; i < x; i++)
 	{
 		for (int j = 0; j < y; j++)
@@ -218,7 +224,7 @@ void EditorClass::Update(MainRenderWindow &mainWindow)
 			mainWindow.window.draw(tile[i][j]);
 		}
 	}
-	
+
 	sf::Event event;
 	while (mainWindow.window.pollEvent(event))
 	{
@@ -264,6 +270,7 @@ bool GameClass::Start(MainRenderWindow& mainWindow)
 	}
 
 	player.nextPos = player.getPosition();
+	myAudio.loadSounds();
 	gameActive = true;
 	return true;
 }
@@ -272,6 +279,21 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 {
 	mainWindow.window.clear(sf::Color::White);
 	deltaTime = clock.restart().asSeconds();
+
+	//text settings
+	font.loadFromFile("arial.ttf");
+	coinCounter.setFont(font);
+	coinCounter.setCharacterSize(textSize);
+	coinCounter.setFillColor(sf::Color::Black);
+	coinCounter.setStyle(sf::Text::Regular);
+	coinCounter.setPosition(30, 40);
+	liveCounter.setPosition(30, 0);
+	liveCounter.setFont(font);
+	liveCounter.setCharacterSize(textSize);
+	liveCounter.setFillColor(sf::Color::Black);
+	liveCounter.setStyle(sf::Text::Regular);
+
+
 	//Controls
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
@@ -280,6 +302,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 		{
 			player.velocity.x += player.speed * deltaTime;
 			player.velocity.y += deltaTime;
+			myAudio.sound.setBuffer(myAudio.walkSB);
+			myAudio.sound.play();
 		}
 		else
 		{
@@ -293,6 +317,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 		{
 			player.velocity.x -= player.speed * deltaTime;
 			player.velocity.y += deltaTime;
+			myAudio.sound.setBuffer(myAudio.walkSB);
+			myAudio.sound.play();
 		}
 		else
 		{
@@ -332,6 +358,7 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 		player.velocity.y = -1.0f;
 	}
 
+
 	//this is the players next potential position if they aren't obstructed
 	player.nextPos = player.getPosition() + player.velocity;
 	//project a hit box
@@ -353,35 +380,37 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 				Collision pcol = player.CollisionCheck(tile[i][j].sprite.getGlobalBounds());
 				if (pcol.hit)
 				{
+					std::cout << "Platform Hit!" << std::endl;
 					//hit something vertically 
 					if (pcol.dir.x == 0)
 					{
 						//hitting the tile below us
 						if (pcol.dir.y >= 0.0f)
 						{
+							//we're on top of tiles
 							player.nextPos.y = tile[i][j].sprite.getGlobalBounds().top - 32 - 0.1f;
 							player.isGrounded = true;
 						}
 						else
 						{
 							//instead of using 32 we should be getting the height of the sprite incase the height of the sprite changes
-							player.nextPos.y = tile[i][j].sprite.getGlobalBounds().top + 32 + 0.01f;
+							player.nextPos.y = tile[i][j].sprite.getGlobalBounds().top + tile[i][j].sprite.getGlobalBounds().height + 0.1f;
 							player.velocity.y = 0.0f;
 						}
 					}
-				}
-				else //horizontal hit
-				{
-					//right side of the tile
-					if (pcol.dir.x >= 0.0f)
+					else //horizontal hit
 					{
-						player.nextPos.x = tile[i][j].sprite.getGlobalBounds().left - 32;
-						player.velocity.x = 0.0f;
-					}
-					else
-					{
-						player.nextPos.x = tile[i][j].sprite.getGlobalBounds().left + tile[i][j].sprite.getGlobalBounds().width;
-						player.velocity.x = 0.0f;
+						//right side of the tile
+						if (pcol.dir.x >= 0.0f)
+						{
+							player.nextPos.x = tile[i][j].sprite.getGlobalBounds().left - 32;
+							player.velocity.x = 0.0f;
+						}
+						else
+						{
+							player.nextPos.x = tile[i][j].sprite.getGlobalBounds().left + tile[i][j].sprite.getGlobalBounds().width;
+							player.velocity.x = 0.0f;
+						}
 					}
 				}
 			}
@@ -394,6 +423,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 					player.lives--;
 					//reset position
 					player.Respawn();
+					myAudio.sound.setBuffer(myAudio.pDeathSB);
+					myAudio.sound.play();
 					std::cout << "Player hit lava" << std::endl;
 					if (player.lives == 0)
 					{
@@ -410,6 +441,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 				{
 					std::cout << "Player Grabbed Coin" << std::endl;
 					player.coins++;
+					myAudio.sound.setBuffer(myAudio.coinSB);
+					myAudio.sound.play();
 					tile[i][j].ChangeActor(Actor::Type::None);
 				}
 			}
@@ -422,6 +455,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 					player.lives--;
 					//reset position
 					player.Respawn();
+					myAudio.sound.setBuffer(myAudio.pDeathSB);
+					myAudio.sound.play();
 					std::cout << "Player hit spike" << std::endl;
 					if (player.lives == 0)
 					{
@@ -444,6 +479,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 						{
 							//we're on top of the enemy
 							//kill enemy (temp code until given proper death)
+							myAudio.sound.setBuffer(myAudio.deathSB);
+							myAudio.sound.play();
 							tile[i][j].ChangeActor(Actor::Type::None);
 						}
 						else
@@ -451,6 +488,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 							//enemy above 
 							player.lives--;
 							player.Respawn();
+							myAudio.sound.setBuffer(myAudio.pDeathSB);
+							myAudio.sound.play();
 							if (player.lives == 0)
 							{
 								//game over again
@@ -462,6 +501,8 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 					{
 						player.lives--;
 						player.Respawn();
+						myAudio.sound.setBuffer(myAudio.pDeathSB);
+						myAudio.sound.play();
 						if (player.lives == 0)
 						{
 							//game over again
@@ -472,7 +513,7 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 			}
 			else if (tile[i][j].actor.type == Actor::Type::Exit)
 			{
-			Collision pcol = player.CollisionCheck(tile[i][j].sprite.getGlobalBounds());
+				Collision pcol = player.CollisionCheck(tile[i][j].sprite.getGlobalBounds());
 				if (pcol.hit)
 				{
 					std::cout << "Exit Hit!" << std::endl;
@@ -495,8 +536,12 @@ void GameClass::Update(MainRenderWindow& mainWindow)
 	std::cout << "Player nextPos " << player.nextPos.x << "," << player.nextPos.y << std::endl;
 	//set player Postition 
 	player.setPosition(player.nextPos);
+	coinCounter.setString("Coins: " + std::to_string(player.coins));
+	liveCounter.setString("Lives: " + std::to_string(player.lives));
 	//draw
 	mainWindow.window.draw(player);
+	mainWindow.window.draw(coinCounter);
+	mainWindow.window.draw(liveCounter);
 	mainWindow.window.display();
 
 }

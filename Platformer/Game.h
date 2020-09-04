@@ -1,5 +1,6 @@
 #pragma once
 #include "Editor.h"
+#include "Audio.h"
 
 struct Collision
 {
@@ -14,6 +15,7 @@ public:
 	int lives;
 	int coins;
 	bool isDead;
+
 	//Collision hitbox, check next loc for collision
 	sf::FloatRect nextRect;
 	//if we can move, this is ther position to move to
@@ -54,6 +56,8 @@ public:
 	static const int x = 30;
 	static const int y = 20;
 
+	AudioClass myAudio;
+
 	Player player;
 	//std::Vector<Enemy> enemies;
 
@@ -70,7 +74,44 @@ public:
 	float gravity;
 	float friction;
 	int coins;
+	int lives;
+	sf::Text coinCounter;
+	sf::Text liveCounter;
+	sf::Font font;
+	int textSize = 30;
 };
+
+class Counter : public sf::Drawable, public sf::Transformable
+{
+private:
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+	{
+		target.draw(rect, states);
+		target.draw(text, states);
+	}
+public:
+	int textSize = 30;
+	float rectOutline = 1;
+	sf::RectangleShape rect;
+	sf::Font font;
+	sf::Text text;
+	sf::FloatRect rBounds;
+
+	Counter()
+	{
+		font.loadFromFile("arial.ttf");
+		text.setFont(font);
+		text.setCharacterSize(textSize);
+		text.setFillColor(sf::Color::Black);
+		text.setStyle(sf::Text::Regular);
+		rect.setFillColor(sf::Color::White);
+		rect.setOutlineColor(sf::Color::Black);
+		rect.setOutlineThickness(rectOutline);
+	}
+	
+	
+};
+
 
 int sign(int x);
 int sign(float x);

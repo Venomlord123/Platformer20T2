@@ -87,12 +87,12 @@ public:
 	{
 		levelEditorButton.text.setString("Level Editor");
 		levelEditorButton.rect.setSize(sf::Vector2f(levelEditorButton.text.getGlobalBounds().width + 6, levelEditorButton.text.getGlobalBounds().height + 6));
-		levelEditorButton.rect.setPosition(sf::Vector2f(1025 - (1025 / 2 - (levelEditorButton.rect.getSize().x / 2)), 650 - (650 / 2 - (levelEditorButton.rect.getSize().y / 2))));
-		levelEditorButton.text.setPosition(levelEditorButton.rect.getPosition().x + (levelEditorButton.rect.getSize().x / 400000), levelEditorButton.rect.getPosition().y);
+		levelEditorButton.rect.setPosition(sf::Vector2f(1025 - (1025 / 2 - (levelEditorButton.rect.getSize().x / 2)), 650 - (700 / 2 - (levelEditorButton.rect.getSize().y / 2))));
+		levelEditorButton.text.setPosition(levelEditorButton.rect.getPosition().x + (levelEditorButton.rect.getSize().x / 400000), levelEditorButton.rect.getPosition().y - 4);
 		gameButton.text.setString("Game");
 		gameButton.rect.setSize(sf::Vector2f(gameButton.text.getGlobalBounds().width + 6, gameButton.text.getGlobalBounds().height + 6));
-		gameButton.rect.setPosition(sf::Vector2f(1025 - (1025 / 2 + 150 - (gameButton.rect.getSize().x / 2)), 650 - (650 / 2 - (gameButton.rect.getSize().y / 2))));
-		gameButton.text.setPosition(gameButton.rect.getPosition().x + (gameButton.rect.getSize().x / 400000), gameButton.rect.getPosition().y);
+		gameButton.rect.setPosition(sf::Vector2f(1025 - (1025 / 2 + 150 - (gameButton.rect.getSize().x / 2)), 650 - (700 / 2 - (gameButton.rect.getSize().y / 2))));
+		gameButton.text.setPosition(gameButton.rect.getPosition().x + (gameButton.rect.getSize().x / 400000), gameButton.rect.getPosition().y - 4);
 	}
 
 	sf::Vector2f worldPos;

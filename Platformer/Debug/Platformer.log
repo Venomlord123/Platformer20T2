@@ -9,23 +9,23 @@ C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Editor.h(514,21): warnin
 C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Editor.h(531,21): warning C4018: '<': signed/unsigned mismatch
 C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Editor.h(548,21): warning C4018: '<': signed/unsigned mismatch
 C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Editor.h(565,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(15,21): warning C4129: '.': unrecognized character escape sequence
-C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(117,65): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(17,21): warning C4129: '.': unrecognized character escape sequence
+C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(120,65): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(119,60): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(122,60): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(119,47): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(122,47): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(120,55): warning C4305: 'argument': truncation from 'double' to 'T'
+C:\Users\vicki\OneDrive\Documents\Platformer\Platformer\Source.cpp(123,55): warning C4305: 'argument': truncation from 'double' to 'T'
           with
           [
               T=float
